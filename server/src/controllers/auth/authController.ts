@@ -3,8 +3,15 @@ import { AppDataSource } from "../../datasource/data-source.ts";
 import { User } from "../../entity/User.ts";
 import { compare } from "bcrypt-ts";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-const login = async (req: Request, res: Response, next: NextFunction) => {
+dotenv.config();
+
+export const login = async (
+   req: Request,
+   res: Response,
+   next: NextFunction,
+) => {
    try {
       // recup donner user
       const { email, password } = req.body;

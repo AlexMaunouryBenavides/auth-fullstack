@@ -5,11 +5,13 @@ import {
    add,
    edit,
    destroy,
+   read,
 } from "./controllers/user/userController.ts";
 
 const router = Router();
 
 router.get("/users", browse);
+router.get("/users/:id", read);
 router.post("/users", add);
 router.put("/users/:id", edit);
 router.delete("/users/:id", destroy);

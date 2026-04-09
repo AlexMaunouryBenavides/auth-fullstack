@@ -3,6 +3,7 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppDataSource } from "../../datasource/data-source.ts";
 import { User } from "../../entity/User.ts";
+import { hash, genSalt } from "bcrypt-ts";
 
 export const browse = async (
    req: Request,
@@ -18,46 +19,67 @@ export const browse = async (
    }
 };
 
-// export const readUser = async (req: Request, res: Response) => {
-//    try {
-//       const userRepository = AppDataSource.getRepository(User);
-//       const user = await userRepository.findOneBy({
-//          id: parseInt(req.params.id),
-//       });
-//       if (!user) {
-//          return res.status(404).json({ message: "User not found" });
-//       }
-//       res.json(user);
-//    } catch (error) {
-//       console.error("Error fetching user:", error);
-//       res.status(500).json({ message: "Internal server error" });
-//    }
-// };
+export const read = async (
+   req: Request<{ id: string }>,
+   res: Response,
+   next: NextFunction,
+) => {
+   try {
+      const userRepository = AppDataSource.getRepository(User);
+      const id = Number.parseInt(req.params.id, 10);
+      if (Number.isNaN(id)) {
+         res.status(400).json({ message: "Invalid user ID" });
+         return;
+      }
+
+      const user = await userRepository.findOneBy({ id });
+      if (!user) {
+         res.status(404).json({ message: "User not found" });
+         return;
+      }
+
+      res.json(user);
+   } catch (error) {
+      next(error);
+   }
+};
 
 export const add = async (req: Request, res: Response, next: NextFunction) => {
    try {
       const userRepository = AppDataSource.getRepository(User);
-      const newUser = userRepository.create(req.body);
+
+      // recup user
+      const { name, email, password } = req.body;
+      if (!name || !email || !password) {
+         res.status(400).json({ message: "Missing required fields" });
+         return;
+      }
+
+      // hash du mdp + creation new user
+      const salt = await genSalt(10);
+      const hashPassword = await hash(password, salt);
+      const newUser = userRepository.create({
+         name,
+         email,
+         password: hashPassword,
+      });
+
+      // envoie du user
       const savedUser = await userRepository.save(newUser);
       res.status(201).json(savedUser);
    } catch (error) {
       next(error);
    }
 };
-export const edit = async (req: Request, res: Response, next: NextFunction) => {
+export const edit = async (
+   req: Request<{ id: string }>,
+   res: Response,
+   next: NextFunction,
+) => {
    try {
       const userRepository = AppDataSource.getRepository(User);
-      let idParam = req.params.id;
-      if (Array.isArray(idParam)) {
-         idParam = idParam[0];
-      }
 
-      if (!idParam) {
-         res.status(400).json({ message: "Invalid user ID" });
-         return;
-      }
-
-      const id = Number.parseInt(idParam, 10);
+      const id = Number.parseInt(req.params.id, 10);
       if (Number.isNaN(id)) {
          res.status(400).json({ message: "Invalid user ID" });
          return;
@@ -83,27 +105,18 @@ export const edit = async (req: Request, res: Response, next: NextFunction) => {
    }
 };
 export const destroy = async (
-   req: Request,
+   req: Request<{ id: string }>,
    res: Response,
    next: NextFunction,
 ) => {
    try {
       const userRepository = AppDataSource.getRepository(User);
-      let idParam = req.params.id;
-      if (Array.isArray(idParam)) {
-         idParam = idParam[0];
-      }
-
-      if (!idParam) {
-         res.status(400).json({ message: "Invalid user ID" });
-         return;
-      }
-
-      const id = Number.parseInt(idParam, 10);
+      const id = Number.parseInt(req.params.id, 10);
       if (Number.isNaN(id)) {
          res.status(400).json({ message: "Invalid user ID" });
          return;
       }
+
       const user = await userRepository.findOneBy({ id });
       if (!user) {
          res.status(404).json({ message: "User not found" });

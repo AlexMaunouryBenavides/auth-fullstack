@@ -28,7 +28,7 @@ export const read = async (
       const userRepository = AppDataSource.getRepository(User);
       const id = Number.parseInt(req.params.id, 10);
       if (Number.isNaN(id)) {
-         res.status(400).json({ message: "Invalid user ID" });
+         res.status(400).json({ message: "User not found" });
          return;
       }
 
@@ -51,7 +51,7 @@ export const add = async (req: Request, res: Response, next: NextFunction) => {
       // recup user
       const { name, email, password } = req.body;
       if (!name || !email || !password) {
-         res.status(400).json({ message: "Missing required fields" });
+         res.status(400).json({ message: "Invalid credentials" });
          return;
       }
 
@@ -81,7 +81,7 @@ export const edit = async (
 
       const id = Number.parseInt(req.params.id, 10);
       if (Number.isNaN(id)) {
-         res.status(400).json({ message: "Invalid user ID" });
+         res.status(400).json({ message: "User not found" });
          return;
       }
 
@@ -113,7 +113,7 @@ export const destroy = async (
       const userRepository = AppDataSource.getRepository(User);
       const id = Number.parseInt(req.params.id, 10);
       if (Number.isNaN(id)) {
-         res.status(400).json({ message: "Invalid user ID" });
+         res.status(400).json({ message: "User not found" });
          return;
       }
 

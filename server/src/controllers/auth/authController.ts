@@ -16,7 +16,7 @@ export const login = async (
       // recup donner user
       const { email, password } = req.body;
       if (!email || !password) {
-         res.status(400).json({ message: "Missing required fields" });
+         res.status(400).json({ message: "Invalid credentials" });
          return;
       }
 
@@ -24,14 +24,14 @@ export const login = async (
       const userRepository = AppDataSource.getRepository(User);
       const user = await userRepository.findOneBy({ email });
       if (!user) {
-         res.status(401).json({ message: "credentials invalid" });
+         res.status(401).json({ message: "Invalid credentials" });
          return;
       }
 
       // comparer le mdp avec celui de la bdd
       const isMatch = await compare(password, user.password);
       if (!isMatch) {
-         res.status(401).json({ message: "credentials invalid" });
+         res.status(401).json({ message: "Invalid credentials" });
          return;
       }
 

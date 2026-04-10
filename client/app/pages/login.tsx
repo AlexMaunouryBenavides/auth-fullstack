@@ -1,19 +1,31 @@
 import { useState } from "react";
-import { set } from "valibot";
+import { useNavigate } from "react-router";
 
 export default function login() {
+   const navigate = useNavigate();
    // state to hold the form data
    const [formData, setFormData] = useState({ email: "", password: "" });
-
+   const [error, setError] = useState<string | null>(null);
    // function to handle login changes
    function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
       setFormData({ ...formData, [e.target.name]: e.target.value });
    }
    //    function to handle submit,ready to send the form data to the server
-   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
       e.preventDefault();
       // send formData to the server for authentication
-      console.log(formData);
+      const res = await fetch("http://localhost:3000/api/login", {
+         method: "POST",
+         headers: { "Content-Type": "application/json" },
+         credentials: "include",
+         body: JSON.stringify(formData),
+      });
+      if (res.ok) {
+         navigate("/dashboard");
+      } else {
+         const data = await res.json();
+         setError(data.message || "Login failed");
+      }
    }
    return (
       <div className="flex justify-center items-center flex-col h-screen">
@@ -46,6 +58,11 @@ export default function login() {
                   className="bg-black text-white border-0 shadow-[1px_1px_15px_0px_#14141466] placeholder:text-white placeholder:px-2  "
                />
             </div>
+            {error && (
+               <p className="alert text-red-500 text-sm font-semibold">
+                  {error}
+               </p>
+            )}
             <button
                className=" cursor-pointer bg-green-400 w-50 p-2 font-bold text-md shadow-[1px_1px_15px_0px_#14141466]"
                type="submit"

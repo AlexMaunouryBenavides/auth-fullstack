@@ -1,3 +1,4 @@
+```js
 Fullstack Project (Client & Server)
 Ce projet est composé d'une interface frontend (React Router) et d'une API backend (Express + TypeORM).
 
@@ -66,3 +67,4 @@ Frontend : npm run build puis npm start
 Cypress (Tests E2E) : Dans le dossier client, lancez npm run cy:open.
 
 Typecheck : Pour vérifier les types TypeScript dans le client, lancez npm run typecheck.
+```

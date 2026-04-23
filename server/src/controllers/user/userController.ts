@@ -1,8 +1,8 @@
 // controller for user from entity/user.ts
 // fonction browse, read, edit, add, delete
 import type { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../../datasource/data-source.ts";
-import { User } from "../../entity/User.ts";
+import { AppDataSource } from "../../datasource/data-source.js";
+import { User } from "../../entity/User.js";
 import { hash, genSalt } from "bcrypt-ts";
 
 export const browse = async (

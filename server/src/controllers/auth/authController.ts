@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../../datasource/data-source.ts";
-import { User } from "../../entity/User.ts";
+import { AppDataSource } from "../../datasource/data-source.js";
+import { User } from "../../entity/User.js";
 import { compare } from "bcrypt-ts";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";

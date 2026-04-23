@@ -3,7 +3,7 @@ import { AppDataSource } from "./datasource/data-source.js";
 import cors from "cors";
 
 import express from "express";
-import router from "./routes.ts";
+import router from "./routes.js";
 
 AppDataSource.initialize()
    .then(async () => {

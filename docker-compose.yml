@@ -1,0 +1,41 @@
+services:
+   db:
+      image: mysql:8
+      restart: unless-stopped
+      environment:
+         MYSQL_ROOT_PASSWORD: 1234
+         MYSQL_DATABASE: authfullstack
+
+      volumes:
+         - db_data:/var/lib/mysql
+      healthcheck:
+         test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+         interval: 10s
+         timeout: 5s
+         retries: 5
+
+   server:
+      build:
+         context: ./server
+         dockerfile: Dockerfile
+      ports:
+         - "3000:3000"
+      env_file:
+         - ./server/.env
+      depends_on:
+         db:
+            condition: service_healthy
+      restart: unless-stopped
+
+   client:
+      build:
+         context: ./client
+         dockerfile: Dockerfile
+      ports:
+         - "80:80"
+      depends_on:
+         - server
+      restart: unless-stopped
+
+volumes:
+   db_data:

@@ -1,22 +1,21 @@
-FROM node:20-alpine AS development-dependencies-env
+FROM node:20-alpine AS dev
 COPY . /app
 WORKDIR /app
-RUN npm ci
+RUN npm i
 
-FROM node:20-alpine AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-RUN npm ci --omit=dev
-
-FROM node:20-alpine AS build-env
+FROM node:20-alpine AS build
 COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
+COPY --from=dev /app/node_modules /app/node_modules
 WORKDIR /app
 RUN npm run build
 
-FROM node:20-alpine
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
-WORKDIR /app
-CMD ["npm", "run", "start"]
+FROM nginx:stable-trixie
+COPY --from=build /app/build/client /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+# build image
+# docker build -t auth-fullstack-client .
+
+# lancer le conteneur
+# docker run -p 80:80 auth-fullstack-client
